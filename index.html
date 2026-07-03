@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="iPoint — интернет-магазин новых iPhone с быстрой доставкой и гарантией.">
+  <title>iPoint — магазин iPhone</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="announcement">
+    <span>Бесплатная доставка по Москве от 80 000 ₽</span>
+    <span class="announcement-divider"></span>
+    <span>Гарантия 1 год</span>
+  </div>
+
+  <header class="site-header">
+    <a class="logo" href="#top" aria-label="iPoint — на главную">i<span>Point</span><i>.</i></a>
+    <nav class="main-nav" aria-label="Основная навигация">
+      <a href="#catalog">Каталог</a>
+      <a href="#advantages">Преимущества</a>
+      <a href="#delivery">Доставка</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-button search-trigger" type="button" aria-label="Перейти к поиску">
+        <svg aria-hidden="true"><use href="#icon-search"></use></svg>
+      </button>
+      <button class="cart-button" type="button" aria-label="Открыть корзину">
+        <svg aria-hidden="true"><use href="#icon-bag"></use></svg>
+        <span>Корзина</span>
+        <b class="cart-count">0</b>
+      </button>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <img class="hero-image" src="assets/products/iphone-16.jpg" alt="Настоящие iPhone 16 в цвете ультрамарин">
+      <div class="hero-content">
+        <p class="eyebrow">Новая коллекция</p>
+        <h1 id="hero-title">Твой новый iPhone.<br><em>Уже здесь.</em></h1>
+        <p>Оригинальные устройства Apple с официальной гарантией и быстрой доставкой.</p>
+        <div class="hero-actions">
+          <a class="button button-dark" href="#catalog">Смотреть каталог</a>
+          <span>от 4 490 ₽ / мес.</span>
+        </div>
+      </div>
+      <div class="hero-note">
+        <span>01</span>
+        <p>Технологии,<br>которые вдохновляют</p>
+      </div>
+    </section>
+
+    <section class="advantages" id="advantages" aria-label="Преимущества магазина">
+      <article>
+        <span class="advantage-icon">
+          <svg aria-hidden="true"><use href="#icon-shield"></use></svg>
+        </span>
+        <div><h3>Только оригинал</h3><p>Проверяем каждый iPhone перед отправкой</p></div>
+      </article>
+      <article>
+        <span class="advantage-icon">
+          <svg aria-hidden="true"><use href="#icon-truck"></use></svg>
+        </span>
+        <div><h3>Доставка за 2 часа</h3><p>По Москве, в регионы — от одного дня</p></div>
+      </article>
+      <article>
+        <span class="advantage-icon">
+          <svg aria-hidden="true"><use href="#icon-card"></use></svg>
+        </span>
+        <div><h3>Оплата как удобно</h3><p>Картой, наличными или в рассрочку</p></div>
+      </article>
+      <article>
+        <span class="advantage-icon">
+          <svg aria-hidden="true"><use href="#icon-refresh"></use></svg>
+        </span>
+        <div><h3>Выгодный Trade-in</h3><p>Обменяйте старое устройство на новое</p></div>
+      </article>
+    </section>
+
+    <section class="catalog-section" id="catalog">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Выберите свой</p>
+          <h2>Каталог iPhone</h2>
+        </div>
+        <p>Найдите модель, которая подходит именно вам. Все устройства в наличии.</p>
+      </div>
+
+      <div class="catalog-toolbar">
+        <label class="search-box">
+          <svg aria-hidden="true"><use href="#icon-search"></use></svg>
+          <input id="searchInput" type="search" placeholder="Поиск по каталогу" autocomplete="off">
+        </label>
+        <button class="mobile-filter-button" id="mobileFilterButton" type="button">
+          <svg aria-hidden="true"><use href="#icon-sliders"></use></svg>
+          Фильтры
+        </button>
+        <label class="sort-control">
+          <span>Сортировать:</span>
+          <select id="sortSelect" aria-label="Сортировка товаров">
+            <option value="popular">По популярности</option>
+            <option value="price-asc">Сначала дешевле</option>
+            <option value="price-desc">Сначала дороже</option>
+            <option value="newest">Сначала новинки</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="catalog-layout">
+        <aside class="filters" id="filtersPanel">
+          <div class="filter-mobile-head">
+            <strong>Фильтры</strong>
+            <button id="closeFilters" type="button" aria-label="Закрыть фильтры">×</button>
+          </div>
+          <div class="filter-group">
+            <button class="filter-title" type="button" aria-expanded="true">Модель <span>−</span></button>
+            <div class="filter-content" id="modelFilters"></div>
+          </div>
+          <div class="filter-group">
+            <button class="filter-title" type="button" aria-expanded="true">Объём памяти <span>−</span></button>
+            <div class="filter-content storage-filter" id="storageFilters"></div>
+          </div>
+          <div class="filter-group">
+            <button class="filter-title" type="button" aria-expanded="true">Цена <span>−</span></button>
+            <div class="filter-content price-filter">
+              <div class="price-inputs">
+                <label>от <input id="priceMin" type="number" min="0" step="1000" value="0"></label>
+                <label>до <input id="priceMax" type="number" min="0" step="1000" value="160000"></label>
+              </div>
+              <input id="priceRange" type="range" min="50000" max="160000" step="1000" value="160000" aria-label="Максимальная цена">
+            </div>
+          </div>
+          <label class="switch-row">
+            <span>Только в наличии</span>
+            <input id="stockOnly" type="checkbox">
+            <i></i>
+          </label>
+          <button class="reset-filters" id="resetFilters" type="button">Сбросить фильтры</button>
+          <button class="button button-dark apply-filters" id="applyFilters" type="button">Показать товары</button>
+        </aside>
+
+        <div class="products-area">
+          <div class="products-meta">
+            <span id="productCount">0 товаров</span>
+            <div id="activeFilters" class="active-filters"></div>
+          </div>
+          <div class="product-grid" id="productGrid"></div>
+          <div class="empty-state" id="emptyState" hidden>
+            <span>⌕</span>
+            <h3>Ничего не нашли</h3>
+            <p>Попробуйте изменить параметры фильтрации.</p>
+            <button class="button button-dark" id="emptyReset" type="button">Сбросить фильтры</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="delivery-banner" id="delivery">
+      <div>
+        <p class="eyebrow">Сервис iPoint</p>
+        <h2>Новый iPhone<br>сегодня вечером</h2>
+      </div>
+      <p>Закажите до 18:00 — привезём в удобный двухчасовой интервал. Перед оплатой всё проверим вместе с вами.</p>
+      <a class="button button-light" href="#catalog">Выбрать модель</a>
+    </section>
+  </main>
+
+  <footer>
+    <a class="logo logo-light" href="#top">i<span>Point</span><i>.</i></a>
+    <p>Оригинальная техника Apple с заботой о вас.</p>
+    <span>© 2026 iPoint</span>
+  </footer>
+
+  <div class="overlay" id="overlay"></div>
+  <aside class="cart-drawer" id="cartDrawer" aria-label="Корзина" aria-hidden="true">
+    <div class="cart-head">
+      <div><p>Ваш заказ</p><h2>Корзина <span id="cartTitleCount">0</span></h2></div>
+      <button class="close-cart" type="button" aria-label="Закрыть корзину">×</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-empty" id="cartEmpty">
+      <span class="empty-bag"><svg aria-hidden="true"><use href="#icon-bag"></use></svg></span>
+      <h3>Корзина пока пуста</h3>
+      <p>Добавьте iPhone из каталога — он появится здесь.</p>
+      <button class="button button-dark close-cart" type="button">Перейти в каталог</button>
+    </div>
+    <div class="cart-footer" id="cartFooter" hidden>
+      <div class="cart-summary"><span>Товары</span><b id="cartSubtotal">0 ₽</b></div>
+      <div class="cart-summary delivery-row"><span>Доставка</span><b>Бесплатно</b></div>
+      <div class="cart-total"><span>Итого</span><strong id="cartTotal">0 ₽</strong></div>
+      <button class="button button-dark checkout-button" type="button">Оформить заказ <span>→</span></button>
+      <p>Нажимая кнопку, вы соглашаетесь с условиями продажи</p>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span>✓</span><p>Товар добавлен в корзину</p>
+  </div>
+
+  <svg class="svg-sprite" aria-hidden="true">
+    <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></symbol>
+    <symbol id="icon-bag" viewBox="0 0 24 24"><path d="M5 8h14l-1 13H6L5 8Z"></path><path d="M9 9V6a3 3 0 0 1 6 0v3"></path></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.5 3.1 7.9 7.5 9.5 4.4-1.6 7.5-5 7.5-9.5V6L12 3Z"></path><path d="m8.5 12 2 2 5-5"></path></symbol>
+    <symbol id="icon-truck" viewBox="0 0 24 24"><path d="M3 6h11v11H3zM14 10h4l3 3v4h-7z"></path><circle cx="7" cy="18" r="2"></circle><circle cx="18" cy="18" r="2"></circle></symbol>
+    <symbol id="icon-card" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 10h18M7 15h4"></path></symbol>
+    <symbol id="icon-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"></path><path d="M18.5 9A7 7 0 0 0 6 7M5.5 15A7 7 0 0 0 18 17"></path></symbol>
+    <symbol id="icon-sliders" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"></path><circle cx="16" cy="7" r="2"></circle><circle cx="8" cy="17" r="2"></circle></symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 3h6l1 4H8l1-4ZM7 7l1 14h8l1-14"></path><path d="M10 11v6M14 11v6"></path></symbol>
+  </svg>
+
+  <script src="app.js"></script>
+</body>
+</html>
