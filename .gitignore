@@ -1,0 +1,11 @@
+.env
+*.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+bot/data/
+bot/*.db
+bot/*.sqlite3
+site-deploy.zip
