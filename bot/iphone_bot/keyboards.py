@@ -7,7 +7,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 def main_menu(is_admin: bool) -> ReplyKeyboardMarkup:
     rows = [
         [KeyboardButton(text="Каталог"), KeyboardButton(text="Корзина")],
-        [KeyboardButton(text="Мой ID")],
+        [KeyboardButton(text="Поиск"), KeyboardButton(text="Мой ID")],
     ]
     if is_admin:
         rows.append([KeyboardButton(text="Добавить товар")])
@@ -18,9 +18,10 @@ def catalog_keyboard(products) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     for product in products:
         builder.button(
-            text=product["name"],
+            text=f"{product['name']} · {product['color']}",
             callback_data=f"product:{product['id']}",
         )
+    builder.button(text="Поиск", callback_data="search")
     builder.button(text="Корзина", callback_data="cart")
     builder.adjust(1)
     return builder.as_markup()

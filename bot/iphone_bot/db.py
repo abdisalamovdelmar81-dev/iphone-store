@@ -127,10 +127,10 @@ class StoreDB:
             await self.db.executemany("UPDATE products SET image_url = ? WHERE id = ?", updates)
             await self.db.commit()
 
-    async def add_product(self, name: str, quantity: int, price: int, color: str = "") -> int:
+    async def add_product(self, name: str, quantity: int, price: int, color: str = "", image_url: str = "") -> int:
         cursor = await self.db.execute(
-            "INSERT INTO products(name, quantity, price, color, created_at) VALUES (?, ?, ?, ?, ?)",
-            (name.strip(), quantity, price, color.strip(), utc_now()),
+            "INSERT INTO products(name, quantity, price, color, image_url, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+            (name.strip(), quantity, price, color.strip(), image_url.strip(), utc_now()),
         )
         await self.db.commit()
         return int(cursor.lastrowid)
