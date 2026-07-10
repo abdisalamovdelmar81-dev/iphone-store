@@ -18,15 +18,10 @@ class AddProductFlow(StatesGroup):
     name = State()
     quantity = State()
     price = State()
-    color = State()
 
 
 class OrderFlow(StatesGroup):
     address = State()
-
-
-class SearchFlow(StatesGroup):
-    query = State()
 
 
 def money(value: int) -> str:
@@ -47,7 +42,6 @@ def user_full_name(message: Message) -> str:
 def product_text(product) -> str:
     return (
         f"{product['name']}\n"
-        f"Цвет: {product['color']}\n"
         f"Цена: {money(product['price'])}\n"
         f"В наличии: {product['quantity']} шт."
     )
@@ -62,7 +56,7 @@ def cart_text(items: list[CartLine]) -> str:
     for item in items:
         total += item.subtotal
         lines.append(
-            f"- {item.name}, {item.color}: {item.cart_quantity} шт. x {money(item.price)} = {money(item.subtotal)}"
+            f"- {item.name}: {item.cart_quantity} шт. x {money(item.price)} = {money(item.subtotal)}"
         )
     lines.append(f"\nИтого: {money(total)}")
     return "\n".join(lines)
@@ -85,7 +79,7 @@ def order_admin_text(
         "Товары:",
     ]
     for item in items:
-        lines.append(f"- {item.name}, {item.color}: {item.cart_quantity} шт. x {money(item.price)}")
+        lines.append(f"- {item.name}: {item.cart_quantity} шт. x {money(item.price)}")
     lines.append(f"\nИтого: {money(total)}")
     return "\n".join(lines)
 
@@ -139,33 +133,11 @@ def setup_router(db: StoreDB, config: Config) -> Router:
         await state.clear()
         await show_cart_message(message, db, message.from_user.id)
 
-    @router.message(Command("search"))
-    @router.message(F.text == "Поиск")
-    async def search(message: Message, state: FSMContext) -> None:
-        await state.set_state(SearchFlow.query)
-        await message.answer("Напиши название или цвет товара. Например: `iPhone 16` или `розовый`.", parse_mode="Markdown")
-
-    @router.message(SearchFlow.query)
-    async def search_query(message: Message, state: FSMContext) -> None:
-        query = (message.text or "").strip()
-        await state.clear()
-        if len(query) < 2:
-            await message.answer("Напиши минимум 2 символа для поиска.")
-            return
-        await send_catalog(message, db, query=query)
-
     @router.callback_query(F.data == "catalog")
     async def catalog_callback(callback: CallbackQuery) -> None:
         await callback.answer()
         if callback.message:
             await send_catalog(callback.message, db)
-
-    @router.callback_query(F.data == "search")
-    async def search_callback(callback: CallbackQuery, state: FSMContext) -> None:
-        await callback.answer()
-        await state.set_state(SearchFlow.query)
-        if callback.message:
-            await callback.message.answer("Напиши название или цвет товара.")
 
     @router.callback_query(F.data.startswith("product:"))
     async def product_callback(callback: CallbackQuery) -> None:
@@ -177,14 +149,7 @@ def setup_router(db: StoreDB, config: Config) -> Router:
                 await callback.message.answer("Товар не найден.")
             return
         if callback.message:
-            if product["image_url"]:
-                await callback.message.answer_photo(
-                    photo=product["image_url"],
-                    caption=product_text(product),
-                    reply_markup=product_keyboard(product_id),
-                )
-            else:
-                await callback.message.answer(product_text(product), reply_markup=product_keyboard(product_id))
+            await callback.message.answer(product_text(product), reply_markup=product_keyboard(product_id))
 
     @router.callback_query(F.data.startswith("add_cart:"))
     async def add_cart_callback(callback: CallbackQuery) -> None:
@@ -263,10 +228,10 @@ def setup_router(db: StoreDB, config: Config) -> Router:
         args = (command.args or "").strip()
         if args:
             try:
-                name, qty, price, color = [part.strip() for part in args.split("|")]
-                product_id = await db.add_product(name, int(qty), int(price), color)
+                name, qty, price = [part.strip() for part in args.split("|")]
+                product_id = await db.add_product(name, int(qty), int(price))
             except ValueError:
-                await message.answer("Формат: `/add iPhone 16 | 5 | 84990 | Ультрамарин`", parse_mode="Markdown")
+                await message.answer("Формат: `/add iPhone 16 | 5 | 84990`", parse_mode="Markdown")
                 return
             await message.answer(f"Товар добавлен. ID: {product_id}")
             return
@@ -317,22 +282,11 @@ def setup_router(db: StoreDB, config: Config) -> Router:
         if price <= 0:
             await message.answer("Цена должна быть больше 0.")
             return
-        await state.update_data(price=price)
-        await state.set_state(AddProductFlow.color)
-        await message.answer("Напиши цвет товара. Например: Ультрамарин")
-
-    @router.message(AddProductFlow.color)
-    async def add_color(message: Message, state: FSMContext) -> None:
-        color = (message.text or "").strip()
-        if len(color) < 2:
-            await message.answer("Напиши цвет товара.")
-            return
         data = await state.get_data()
         product_id = await db.add_product(
             name=data["name"],
             quantity=data["quantity"],
-            price=data["price"],
-            color=color,
+            price=price,
         )
         await state.clear()
         await message.answer(f"Готово, товар добавлен. ID: {product_id}")
