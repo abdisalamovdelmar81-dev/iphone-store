@@ -53,6 +53,7 @@ class StoreDB:
                 quantity INTEGER NOT NULL CHECK(quantity >= 0),
                 price INTEGER NOT NULL CHECK(price >= 0),
                 color TEXT NOT NULL DEFAULT '',
+                image_url TEXT NOT NULL DEFAULT '',
                 created_at TEXT NOT NULL
             );
 
@@ -82,29 +83,49 @@ class StoreDB:
             );
             """
         )
+        await self._ensure_product_images_column()
         await self.db.commit()
+
+    async def _ensure_product_images_column(self) -> None:
+        cursor = await self.db.execute("PRAGMA table_info(products)")
+        columns = {row["name"] for row in await cursor.fetchall()}
+        if "image_url" not in columns:
+            await self.db.execute("ALTER TABLE products ADD COLUMN image_url TEXT NOT NULL DEFAULT ''")
 
     async def _seed_products(self) -> None:
         cursor = await self.db.execute("SELECT COUNT(*) AS count FROM products")
         row = await cursor.fetchone()
         if row and row["count"]:
+            await self._fill_missing_product_images()
             return
 
         products = [
-            ("iPhone 16 Pro Max 256 ГБ", 5, 139990, "Натуральный титан"),
-            ("iPhone 16 Pro 256 ГБ", 7, 119990, "Пустынный титан"),
-            ("iPhone 16 128 ГБ", 10, 84990, "Ультрамарин"),
-            ("iPhone 15 Pro Max 256 ГБ", 4, 119990, "Синий титан"),
-            ("iPhone 15 128 ГБ", 12, 72990, "Розовый"),
-            ("iPhone 14 128 ГБ", 8, 61990, "Голубой"),
-            ("iPhone 13 128 ГБ", 6, 54990, "Тёмная ночь"),
+            ("iPhone 16 Pro Max 256 ГБ", 5, 139990, "Натуральный титан", image_url_for_name("iPhone 16 Pro Max 256 ГБ")),
+            ("iPhone 16 Pro 256 ГБ", 7, 119990, "Пустынный титан", image_url_for_name("iPhone 16 Pro 256 ГБ")),
+            ("iPhone 16 128 ГБ", 10, 84990, "Ультрамарин", image_url_for_name("iPhone 16 128 ГБ")),
+            ("iPhone 15 Pro Max 256 ГБ", 4, 119990, "Синий титан", image_url_for_name("iPhone 15 Pro Max 256 ГБ")),
+            ("iPhone 15 128 ГБ", 12, 72990, "Розовый", image_url_for_name("iPhone 15 128 ГБ")),
+            ("iPhone 14 128 ГБ", 8, 61990, "Голубой", image_url_for_name("iPhone 14 128 ГБ")),
+            ("iPhone 13 128 ГБ", 6, 54990, "Тёмная ночь", image_url_for_name("iPhone 13 128 ГБ")),
         ]
         now = utc_now()
         await self.db.executemany(
-            "INSERT INTO products(name, quantity, price, color, created_at) VALUES (?, ?, ?, ?, ?)",
-            [(name, qty, price, color, now) for name, qty, price, color in products],
+            "INSERT INTO products(name, quantity, price, color, image_url, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+            [(name, qty, price, color, image_url, now) for name, qty, price, color, image_url in products],
         )
         await self.db.commit()
+
+    async def _fill_missing_product_images(self) -> None:
+        cursor = await self.db.execute("SELECT id, name, image_url FROM products")
+        rows = await cursor.fetchall()
+        updates = [
+            (image_url_for_name(row["name"]), row["id"])
+            for row in rows
+            if not row["image_url"] and image_url_for_name(row["name"])
+        ]
+        if updates:
+            await self.db.executemany("UPDATE products SET image_url = ? WHERE id = ?", updates)
+            await self.db.commit()
 
     async def add_product(self, name: str, quantity: int, price: int, color: str) -> int:
         cursor = await self.db.execute(
@@ -237,3 +258,23 @@ class StoreDB:
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
+def image_url_for_name(name: str) -> str:
+    base = "https://raw.githubusercontent.com/abdisalamovdelmar81-dev/iphone-store/main/assets/products"
+    lower = name.casefold()
+    if "iphone 16 pro max" in lower:
+        return f"{base}/iphone-16-pro-hero.jpg"
+    if "iphone 16 pro" in lower:
+        return f"{base}/iphone-16-pro.jpg"
+    if "iphone 16" in lower:
+        return f"{base}/iphone-16.jpg"
+    if "iphone 15 pro" in lower:
+        return f"{base}/iphone-15-pro.jpg"
+    if "iphone 15" in lower:
+        return f"{base}/iphone-15.jpg"
+    if "iphone 14" in lower:
+        return f"{base}/iphone-14.jpg"
+    if "iphone 13" in lower:
+        return f"{base}/iphone-13.jpg"
+    return ""
