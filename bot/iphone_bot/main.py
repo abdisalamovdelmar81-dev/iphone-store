@@ -149,7 +149,14 @@ def setup_router(db: StoreDB, config: Config) -> Router:
                 await callback.message.answer("Товар не найден.")
             return
         if callback.message:
-            await callback.message.answer(product_text(product), reply_markup=product_keyboard(product_id))
+            if product["image_url"]:
+                await callback.message.answer_photo(
+                    photo=product["image_url"],
+                    caption=product_text(product),
+                    reply_markup=product_keyboard(product_id),
+                )
+            else:
+                await callback.message.answer(product_text(product), reply_markup=product_keyboard(product_id))
 
     @router.callback_query(F.data.startswith("add_cart:"))
     async def add_cart_callback(callback: CallbackQuery) -> None:
